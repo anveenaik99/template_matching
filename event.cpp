@@ -460,26 +460,52 @@ int check(Mat temp1,Mat temp2)
 }
 
 
-void extract(Mat img,Mat arr[])
+void extract(Mat img,Mat img1,Mat arr[],Mat arr1[])
 {
 	Mat gray(img.rows, img.cols, CV_8UC1);
 	cvtColor(img, gray, CV_BGR2GRAY);
-	Mat img1(img.rows, img.cols, CV_8UC1,Scalar(0));
+	Mat img11(img.rows, img.cols, CV_8UC1,Scalar(0));
 	Canny(gray, gray, 50, 100);
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 	findContours(gray, contours, hierarchy,RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-	drawContours(img1, contours, -1,255,-1);
-	
+	drawContours(img11, contours, -1,255,-1);
+
+	int c=0;
 	for (int i = 0; i < contours.size(); i++)
 	{
+		{
 		Rect r = boundingRect(contours[i]);
-		rectangle(img1, r, 127);
-		img1(r).copyTo(arr[i]);
-		//imshow("w", arr[i]);
+		rectangle(img11, r, 127);
+		img11(r).copyTo(arr[i]);
+		c++;
+		}
 	}
-	
+	cout<<c<<endl;
+	Mat gray1(img1.rows, img1.cols, CV_8UC1);
+	cvtColor(img1, gray1, CV_BGR2GRAY);
+	Mat img12(img1.rows, img1.cols, CV_8UC1,Scalar(0));
+	Canny(gray1, gray1, 50, 100);
+	vector<vector<Point> > contours1;
+	vector<Vec4i> hierarchy1;
+	findContours(gray1, contours1, hierarchy1,RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+	drawContours(img12, contours1, -1,255,-1);
+	c=0;
+	for (int i = 0; i < contours1.size(); i++)
+	{
+		if(contourArea(contours1[i])>165600)
+		{
+		Rect r = boundingRect(contours1[i]);
+		rectangle(img12, r, 127);
+		img12(r).copyTo(arr1[c]);
+		imshow("w",arr1[i]);
+		waitKey(3000);
+		c++;
+		}
+	}
+	cout<<c<<endl;
 }
 
 
@@ -492,14 +518,13 @@ int main()
 	Mat arr1[6];
 	Mat arr2[4];
 
-	extract(img,arr1);
-	extract(img1,arr2);
+	extract(img,img1,arr1,arr2);
 
-	for(int i=0;i<6;i++)
+	/*for(int i=0;i<6;i++)
 		for(int j=0;j<4;j++)
 		{
 			printf("%d with %d makes %d",i+1,j+1,check(arr1[i],arr2[j]));
-		}
+		}*/
 
 	waitKey(0);
 }
